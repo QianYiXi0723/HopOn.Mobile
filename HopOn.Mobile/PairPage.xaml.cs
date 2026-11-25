@@ -49,9 +49,10 @@ public partial class PairPage : ContentPage
     private async void OnPair(object? sender, EventArgs e)
     {
         if (_busy) return;
-        if (_selected is null)
+        var baseUrl = PairAddress.Resolve(_selected, IpEntry.Text);
+        if (baseUrl is null)
         {
-            StatusLabel.Text = "请先搜索并点选一台电脑";
+            StatusLabel.Text = "先搜索并点选电脑，或输入电脑 IP";
             return;
         }
         var code = CodeEntry.Text?.Trim().ToUpperInvariant();
@@ -65,7 +66,7 @@ public partial class PairPage : ContentPage
         StatusLabel.Text = "正在连接…";
         try
         {
-            _source.SetBaseUrl($"http://{_selected.Ip}:{_selected.Port}");
+            _source.SetBaseUrl(baseUrl);
             var ok = await _source.RedeemCodeAsync(code);
             if (ok)
             {

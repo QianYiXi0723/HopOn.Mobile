@@ -22,6 +22,10 @@
             </CollectionView>
         </Frame>
 
+        <Label Text="搜不到时，在电脑「设置→手机连接」看 IP 填这里" FontSize="13" TextColor="Gray" />
+        <Entry x:Name="IpEntry" Placeholder="电脑 IP，如 10.253.244.245"
+               FontSize="16" Keyboard="Text" />
+
         <Label Text="输入电脑屏幕上显示的 6 位验证码" FontSize="13" TextColor="Gray" />
         <Entry x:Name="CodeEntry" MaxLength="6"
                FontSize="18" Keyboard="Text" CharacterSpacing="3" />
