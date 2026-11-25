@@ -23,7 +23,7 @@
         </Frame>
 
         <Label Text="电脑屏幕上显示的 6 位码" FontSize="13" TextColor="Gray" />
-        <Entry x:Name="CodeEntry" Placeholder="例如 W5GY73" MaxLength="6"
+        <Entry x:Name="CodeEntry" MaxLength="6"
                FontSize="18" Keyboard="Text" CharacterSpacing="3" />
         <Button x:Name="BtnPair" Text="连接" Clicked="OnPair" />
         <Label x:Name="StatusLabel" Text="" FontSize="14" TextColor="Gray"
