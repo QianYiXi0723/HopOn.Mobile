@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="HopOn.Mobile.MainPage">
-    <VerticalStackLayout Padding="24" Spacing="16">
-        <Label Text="HopOn Mobile" FontSize="28" FontAttributes="Bold" HorizontalOptions="Center" />
-        <Label x:Name="VersionLabel" Text="加载中…" HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             x:Class="HopOn.Mobile.MainPage"
+             Title="HopOn">
+    <Grid RowDefinitions="Auto,*">
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="16,12">
+            <Label Text="HopOn" FontSize="24" FontAttributes="Bold" VerticalOptions="Center" />
+            <Button x:Name="PairBtn" Grid.Column="1" Text="连接电脑" FontSize="13" Clicked="OnPairClicked" />
+        </Grid>
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout x:Name="Content" Padding="16,0,16,24" Spacing="12" />
+        </ScrollView>
+    </Grid>
 </ContentPage>

@@ -1,4 +1,6 @@
 using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 using System.Collections.ObjectModel;
 
 namespace HopOn.Mobile.Core;
@@ -16,9 +18,24 @@ public sealed class PcRemoteDataSource : IHopOnDataSource
     }
 
     public void SetBaseUrl(string url) => _client.BaseAddress = new Uri(url.TrimEnd('/'));
-
     public Task SavePairTokenAsync(string token) => _store.SetAsync(TokenKey, token);
     public Task<string?> ReadPairTokenAsync() => _store.GetAsync(TokenKey);
+
+    /// <summary>手机扫到的配对 URL：http://ip:port/pair?code=xxx → 设地址 + 兑令牌。</summary>
+    public async Task<bool> ApplyPairUrl(string url)
+    {
+        var u = new Uri(url);
+        SetBaseUrl($"{u.Scheme}://{u.Authority}");
+        var parts = u.Query.TrimStart('?').Split('&');
+        var code = "";
+        foreach (var p in parts)
+        {
+            var kv = p.Split('=', 2);
+            if (kv.Length == 2 && kv[0] == "code") code = Uri.UnescapeDataString(kv[1]);
+        }
+        if (string.IsNullOrEmpty(code)) return false;
+        return await RedeemCodeAsync(code);
+    }
 
     public async Task<bool> RedeemCodeAsync(string code)
     {
@@ -32,49 +49,84 @@ public sealed class PcRemoteDataSource : IHopOnDataSource
 
     public async Task<AppSnapshot> GetSnapshotAsync(CancellationToken ct = default)
     {
-        // 未配对（无 BaseAddress）时不抛异常，返回明确标记，避免 UI 误判崩溃。
         if (_client.BaseAddress is null)
             return new AppSnapshot { Version = "unpaired", Games = Array.Empty<GameStatus>() };
         var token = await ReadPairTokenAsync();
         using var req = new HttpRequestMessage(HttpMethod.Get, "/api/mobile/snapshot");
-        if (!string.IsNullOrEmpty(token))
-            req.Headers.Add("Authorization", "Bearer " + token);
+        if (!string.IsNullOrEmpty(token)) req.Headers.Add("Authorization", "Bearer " + token);
         var r = await _client.SendAsync(req, ct);
         r.EnsureSuccessStatusCode();
         var body = await r.Content.ReadFromJsonAsync<SnapshotResponse>(ct);
-        return new AppSnapshot
-        {
-            Version = body?.version ?? "",
-            Games = new ReadOnlyCollection<GameStatus>(
-                (body?.games ?? new List<GameDto>()).Select(g => new GameStatus
-                {
-                    GameId = g.id, Name = g.name, Max = 0, Current = 0
-                }).ToList())
-        };
+        var games = new ReadOnlyCollection<GameStatus>(
+            (body?.games ?? new List<GameDto>()).Select(g => new GameStatus
+            {
+                GameId = g.id, Name = g.name, StaminaName = g.stamina_name,
+                Current = g.current, Max = g.max,
+                DailyDone = g.daily_done, DailyTotal = g.daily_total,
+                DailyProgress = g.daily_progress, Finished = g.finished, Stale = g.stale
+            }).ToList());
+        var customs = new ReadOnlyCollection<DailyItem>(
+            (body?.custom_dailies ?? new List<DailyDto>()).Select(d => new DailyItem
+            {
+                Id = d.id, Name = d.name, Done = d.done,
+                Times = new ReadOnlyCollection<string>(d.times ?? new List<string>())
+            }).ToList());
+        return new AppSnapshot { Version = body?.version ?? "", Games = games, CustomDailies = customs };
     }
 
-    public Task<IReadOnlyList<DailyItem>> GetDailiesAsync(CancellationToken ct = default) =>
-        Task.FromResult<IReadOnlyList<DailyItem>>(Array.Empty<DailyItem>());
-
-    public Task<CheckInResult> CheckInAsync(string itemId, string date, CancellationToken ct = default) =>
-        Task.FromResult(new CheckInResult { Ok = false, Message = "M1 未接" });
-
-    private sealed class PairResponse
+    public async Task<IReadOnlyList<DailyItem>> GetDailiesAsync(CancellationToken ct = default)
     {
-        public bool ok { get; set; }
-        public string? token { get; set; }
+        if (_client.BaseAddress is null) return Array.Empty<DailyItem>();
+        var token = await ReadPairTokenAsync();
+        using var req = new HttpRequestMessage(HttpMethod.Get, "/api/mobile/dailies");
+        if (!string.IsNullOrEmpty(token)) req.Headers.Add("Authorization", "Bearer " + token);
+        var r = await _client.SendAsync(req, ct);
+        r.EnsureSuccessStatusCode();
+        var body = await r.Content.ReadFromJsonAsync<DailiesResponse>(ct);
+        return new ReadOnlyCollection<DailyItem>(
+            (body?.items ?? new List<DailyDto>()).Select(d => new DailyItem
+            {
+                Id = d.id, Name = d.name, Done = d.done,
+                Times = new ReadOnlyCollection<string>(d.times ?? new List<string>())
+            }).ToList());
     }
 
+    public async Task<CheckInResult> CheckInAsync(string itemId, string date, CancellationToken ct = default)
+    {
+        if (_client.BaseAddress is null) return new CheckInResult { Ok = false, Message = "未配对" };
+        var token = await ReadPairTokenAsync();
+        var payload = JsonSerializer.Serialize(new { id = itemId, date });
+        using var req = new HttpRequestMessage(HttpMethod.Post, "/api/mobile/checkin")
+        {
+            Content = new StringContent(payload, Encoding.UTF8, "application/json")
+        };
+        if (!string.IsNullOrEmpty(token)) req.Headers.Add("Authorization", "Bearer " + token);
+        var r = await _client.SendAsync(req, ct);
+        var body = await r.Content.ReadFromJsonAsync<CheckInResult>(ct);
+        return body ?? new CheckInResult { Ok = false, Message = "无响应" };
+    }
+
+    private sealed class PairResponse { public bool ok { get; set; } public string? token { get; set; } }
     private sealed class SnapshotResponse
     {
         public bool ok { get; set; }
         public string? version { get; set; }
         public List<GameDto>? games { get; set; }
+        public List<DailyDto>? custom_dailies { get; set; }
     }
-
+    private sealed class DailiesResponse { public bool ok { get; set; } public List<DailyDto>? items { get; set; } }
     private sealed class GameDto
     {
-        public string id { get; set; } = "";
-        public string name { get; set; } = "";
+        public string id { get; set; } = ""; public string name { get; set; } = "";
+        public string stamina_name { get; set; } = "";
+        public int current { get; set; } public int max { get; set; }
+        public int daily_done { get; set; } public int daily_total { get; set; }
+        public string daily_progress { get; set; } = "";
+        public bool finished { get; set; } public bool stale { get; set; }
+    }
+    private sealed class DailyDto
+    {
+        public string id { get; set; } = ""; public string name { get; set; } = "";
+        public bool done { get; set; } public List<string>? times { get; set; }
     }
 }

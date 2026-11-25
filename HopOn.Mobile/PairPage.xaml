@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.Maui.Controls"
+             x:Class="HopOn.Mobile.PairPage"
+             Title="连接电脑">
+    <Grid RowDefinitions="Auto,*,Auto" Padding="16">
+        <VerticalStackLayout Grid.Row="0" Spacing="4">
+            <Label Text="扫描电脑上的二维码" FontSize="20" FontAttributes="Bold" />
+            <Label Text="在电脑「定时与状态」里打开手机连接，扫描显示的二维码" FontSize="13" TextColor="Gray" />
+        </VerticalStackLayout>
+        <zxing:CameraBarcodeReaderView x:Name="Scanner" Grid.Row="1"
+                                       BarcodesDetected="OnBarcodesDetected" />
+        <Label x:Name="StatusLabel" Grid.Row="2" Text="" FontSize="14" TextColor="Gray"
+               HorizontalOptions="Center" Padding="0,8" />
+    </Grid>
+</ContentPage>
