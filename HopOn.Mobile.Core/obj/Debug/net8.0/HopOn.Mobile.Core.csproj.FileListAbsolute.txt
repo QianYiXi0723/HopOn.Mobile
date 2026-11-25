@@ -1,0 +1,11 @@
+E:\Apps\HopOn.Mobile\HopOn.Mobile.Core\bin\Debug\net8.0\HopOn.Mobile.Core.deps.json
+E:\Apps\HopOn.Mobile\HopOn.Mobile.Core\bin\Debug\net8.0\HopOn.Mobile.Core.dll
+E:\Apps\HopOn.Mobile\HopOn.Mobile.Core\bin\Debug\net8.0\HopOn.Mobile.Core.pdb
+E:\Apps\HopOn.Mobile\HopOn.Mobile.Core\obj\Debug\net8.0\HopOn.Mobile.Core.GeneratedMSBuildEditorConfig.editorconfig
+E:\Apps\HopOn.Mobile\HopOn.Mobile.Core\obj\Debug\net8.0\HopOn.Mobile.Core.AssemblyInfoInputs.cache
+E:\Apps\HopOn.Mobile\HopOn.Mobile.Core\obj\Debug\net8.0\HopOn.Mobile.Core.AssemblyInfo.cs
+E:\Apps\HopOn.Mobile\HopOn.Mobile.Core\obj\Debug\net8.0\HopOn.Mobile.Core.csproj.CoreCompileInputs.cache
+E:\Apps\HopOn.Mobile\HopOn.Mobile.Core\obj\Debug\net8.0\HopOn.Mobile.Core.dll
+E:\Apps\HopOn.Mobile\HopOn.Mobile.Core\obj\Debug\net8.0\refint\HopOn.Mobile.Core.dll
+E:\Apps\HopOn.Mobile\HopOn.Mobile.Core\obj\Debug\net8.0\HopOn.Mobile.Core.pdb
+E:\Apps\HopOn.Mobile\HopOn.Mobile.Core\obj\Debug\net8.0\ref\HopOn.Mobile.Core.dll

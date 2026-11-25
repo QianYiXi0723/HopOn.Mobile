@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HopOn.Mobile.Core", "HopOn.Mobile.Core\HopOn.Mobile.Core.csproj", "{8E016FE4-8EBD-4324-A4E0-2DD19A82D688}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HopOn.Mobile.Tests", "HopOn.Mobile.Tests\HopOn.Mobile.Tests.csproj", "{90BA3C5A-9CC5-4B78-9B1D-F3CD697231EC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8E016FE4-8EBD-4324-A4E0-2DD19A82D688}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E016FE4-8EBD-4324-A4E0-2DD19A82D688}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E016FE4-8EBD-4324-A4E0-2DD19A82D688}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E016FE4-8EBD-4324-A4E0-2DD19A82D688}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90BA3C5A-9CC5-4B78-9B1D-F3CD697231EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90BA3C5A-9CC5-4B78-9B1D-F3CD697231EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90BA3C5A-9CC5-4B78-9B1D-F3CD697231EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90BA3C5A-9CC5-4B78-9B1D-F3CD697231EC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
