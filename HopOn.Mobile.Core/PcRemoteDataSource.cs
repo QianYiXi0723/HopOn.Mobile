@@ -84,7 +84,7 @@ public sealed class PcRemoteDataSource : IHopOnDataSource
         var customs = new ReadOnlyCollection<DailyItem>(
             (body?.custom_dailies ?? new List<DailyDto>()).Select(d => new DailyItem
             {
-                Id = d.id, Name = d.name, Done = d.done,
+                Id = d.id, Name = d.name, Done = d.done, PlannedToday = d.planned_today,
                 Times = new ReadOnlyCollection<string>(d.times ?? new List<string>())
             }).ToList());
         return new AppSnapshot { Version = body?.version ?? "", Games = games, CustomDailies = customs };
@@ -102,7 +102,7 @@ public sealed class PcRemoteDataSource : IHopOnDataSource
         return new ReadOnlyCollection<DailyItem>(
             (body?.items ?? new List<DailyDto>()).Select(d => new DailyItem
             {
-                Id = d.id, Name = d.name, Done = d.done,
+                Id = d.id, Name = d.name, Done = d.done, PlannedToday = d.planned_today,
                 Times = new ReadOnlyCollection<string>(d.times ?? new List<string>())
             }).ToList());
     }
@@ -144,5 +144,7 @@ public sealed class PcRemoteDataSource : IHopOnDataSource
     {
         public string id { get; set; } = ""; public string name { get; set; } = "";
         public bool done { get; set; } public List<string>? times { get; set; }
+        // 后端按日界算的"今天是否在周计划内"；老后端没有此字段时默认 true（兼容）。
+        public bool planned_today { get; set; } = true;
     }
 }

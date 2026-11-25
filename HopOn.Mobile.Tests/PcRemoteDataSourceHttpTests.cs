@@ -16,6 +16,7 @@ public class PcRemoteDataSourceHttpTests
         public string? LastMethod;
         public string? LastBody;
         public string? LastHost;
+        public bool PlannedToday = true;   // 控制 snapshot 里 custom_dailies 的 planned_today
         protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken ct)
         {
@@ -31,7 +32,7 @@ public class PcRemoteDataSourceHttpTests
                 ? "{\"ok\":true,\"message\":\"ok\"}"
                 : LastPath?.StartsWith("/api/mobile/dailies") == true
                 ? "{\"ok\":true,\"items\":[{\"id\":\"d1\",\"name\":\"喝水\",\"done\":false}]}"
-                : "{\"ok\":true,\"version\":\"m1\",\"games\":[{\"id\":\"genshin\",\"name\":\"原神\",\"stamina_name\":\"原粹树脂\",\"current\":25,\"max\":200,\"daily_done\":4,\"daily_total\":4,\"daily_progress\":\"4/4\",\"finished\":true}],\"custom_dailies\":[{\"id\":\"d1\",\"name\":\"喝水\",\"done\":false,\"times\":[\"08:30\"]}]}";
+                : "{\"ok\":true,\"version\":\"m1\",\"games\":[{\"id\":\"genshin\",\"name\":\"原神\",\"stamina_name\":\"原粹树脂\",\"current\":25,\"max\":200,\"daily_done\":4,\"daily_total\":4,\"daily_progress\":\"4/4\",\"finished\":true}],\"custom_dailies\":[{\"id\":\"d1\",\"name\":\"喝水\",\"done\":false,\"planned_today\":" + (PlannedToday ? "true" : "false") + ",\"times\":[\"08:30\"]}]}";
             return new HttpResponseMessage(HttpStatusCode.OK)
             {
                 Content = new StringContent(body, Encoding.UTF8, "application/json")
@@ -166,5 +167,19 @@ public class PcRemoteDataSourceHttpTests
         Assert.Equal("10.253.2.7:8766", handler.LastHost);
         Assert.Equal("/pair?code=W5GY73", handler.LastPath);
         Assert.Equal("tok-123", await store.GetAsync("hopon.pair_token"));
+    }
+
+    [Fact]
+    public async Task Snapshot_Parses_PlannedToday()
+    {
+        var handler = new FakeHandler { PlannedToday = false };
+        var client = new HttpClient(handler);
+        var ds = new PcRemoteDataSource(new InMemorySecureStore(), client);
+        ds.SetBaseUrl("http://127.0.0.1:8766");
+
+        var snap = await ds.GetSnapshotAsync();
+
+        Assert.Single(snap.CustomDailies);
+        Assert.False(snap.CustomDailies[0].PlannedToday);
     }
 }

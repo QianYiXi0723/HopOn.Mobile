@@ -28,6 +28,8 @@ public sealed class DailyItem
     public string Name { get; set; } = "";
     public bool Done { get; set; }
     public IReadOnlyList<string> Times { get; set; } = Array.Empty<string>();
+    // 后端按 04:00 日界算出的"今天是否在周计划内"；非计划日整条不显示。
+    public bool PlannedToday { get; set; } = true;
 }
 
 public sealed class CheckInResult
