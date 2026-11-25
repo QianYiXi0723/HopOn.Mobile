@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HopOn.Mobile.Core", "HopOn.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HopOn.Mobile.Tests", "HopOn.Mobile.Tests\HopOn.Mobile.Tests.csproj", "{90BA3C5A-9CC5-4B78-9B1D-F3CD697231EC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HopOn.Mobile", "HopOn.Mobile\HopOn.Mobile.csproj", "{1C144F0A-B8CF-4AD6-A62F-4BC1BA13016E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{90BA3C5A-9CC5-4B78-9B1D-F3CD697231EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{90BA3C5A-9CC5-4B78-9B1D-F3CD697231EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{90BA3C5A-9CC5-4B78-9B1D-F3CD697231EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C144F0A-B8CF-4AD6-A62F-4BC1BA13016E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C144F0A-B8CF-4AD6-A62F-4BC1BA13016E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C144F0A-B8CF-4AD6-A62F-4BC1BA13016E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C144F0A-B8CF-4AD6-A62F-4BC1BA13016E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
