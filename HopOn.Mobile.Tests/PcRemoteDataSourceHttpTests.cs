@@ -130,4 +130,20 @@ public class PcRemoteDataSourceHttpTests
         Assert.Equal("/pair?code=ABC234", handler.LastPath);
         Assert.Equal("tok-123", await store.GetAsync("hopon.pair_token"));
     }
+
+    [Fact]
+    public async Task ApplyPairUrl_Hopon_Scheme_Parses_Ip_Port_Code()
+    {
+        var handler = new FakeHandler();
+        var client = new HttpClient(handler);
+        var store = new InMemorySecureStore();
+        var ds = new PcRemoteDataSource(store, client);
+
+        // 新格式：自定义协议，手机扫了不会跳浏览器
+        var ok = await ds.ApplyPairUrl("hopon://pair?ip=10.253.1.5&port=8766&code=ABC234");
+
+        Assert.True(ok);
+        Assert.Equal("/pair?code=ABC234", handler.LastPath);
+        Assert.Equal("tok-123", await store.GetAsync("hopon.pair_token"));
+    }
 }

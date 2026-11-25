@@ -21,19 +21,35 @@ public sealed class PcRemoteDataSource : IHopOnDataSource
     public Task SavePairTokenAsync(string token) => _store.SetAsync(TokenKey, token);
     public Task<string?> ReadPairTokenAsync() => _store.GetAsync(TokenKey);
 
-    /// <summary>手机扫到的配对 URL：http://ip:port/pair?code=xxx → 设地址 + 兑令牌。</summary>
+    /// <summary>
+    /// 手机扫到的配对串。新格式（自定义协议，避免被浏览器劫持）：
+    /// hopon://pair?ip=1.2.3.4&port=8766&code=XXX
+    /// 旧格式（兼容）：http://ip:port/pair?code=XXX
+    /// </summary>
     public async Task<bool> ApplyPairUrl(string url)
     {
-        var u = new Uri(url);
-        SetBaseUrl($"{u.Scheme}://{u.Authority}");
-        var parts = u.Query.TrimStart('?').Split('&');
-        var code = "";
-        foreach (var p in parts)
+        var q = new Dictionary<string, string>();
+        var query = url.Contains('?') ? url.Substring(url.IndexOf('?') + 1) : "";
+        foreach (var p in query.Split('&'))
         {
             var kv = p.Split('=', 2);
-            if (kv.Length == 2 && kv[0] == "code") code = Uri.UnescapeDataString(kv[1]);
+            if (kv.Length == 2) q[kv[0]] = Uri.UnescapeDataString(kv[1]);
         }
-        if (string.IsNullOrEmpty(code)) return false;
+        string baseUrl;
+        if (url.StartsWith("hopon://", StringComparison.OrdinalIgnoreCase))
+        {
+            if (!q.TryGetValue("ip", out var ip) || string.IsNullOrEmpty(ip)) return false;
+            var port = q.GetValueOrDefault("port", "8766");
+            baseUrl = $"http://{ip}:{port}";
+        }
+        else
+        {
+            // 旧格式兼容：从 http://ip:port/... 取 scheme+authority
+            var u = new Uri(url);
+            baseUrl = $"{u.Scheme}://{u.Authority}";
+        }
+        if (!q.TryGetValue("code", out var code) || string.IsNullOrEmpty(code)) return false;
+        SetBaseUrl(baseUrl);
         return await RedeemCodeAsync(code);
     }
 
