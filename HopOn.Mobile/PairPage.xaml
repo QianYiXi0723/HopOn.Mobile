@@ -1,17 +1,32 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.Maui.Controls"
              x:Class="HopOn.Mobile.PairPage"
              Title="连接电脑">
-    <Grid RowDefinitions="Auto,*,Auto" Padding="16">
-        <VerticalStackLayout Grid.Row="0" Spacing="4">
-            <Label Text="扫描电脑上的二维码" FontSize="20" FontAttributes="Bold" />
-            <Label Text="在电脑「定时与状态」里打开手机连接，扫描显示的二维码" FontSize="13" TextColor="Gray" />
-        </VerticalStackLayout>
-        <zxing:CameraBarcodeReaderView x:Name="Scanner" Grid.Row="1"
-                                       BarcodesDetected="OnBarcodesDetected" />
-        <Label x:Name="StatusLabel" Grid.Row="2" Text="" FontSize="14" TextColor="Gray"
+    <VerticalStackLayout Padding="20" Spacing="14">
+        <Label Text="连接电脑" FontSize="22" FontAttributes="Bold" />
+        <Label Text="在电脑「定时与状态」里打开手机连接，然后搜索附近的电脑" FontSize="13" TextColor="Gray" />
+
+        <Button x:Name="BtnDiscover" Text="搜索附近的电脑" Clicked="OnDiscover" />
+
+        <Frame Padding="8" HasShadow="False" BorderColor="LightGray" CornerRadius="6">
+            <CollectionView x:Name="PcList" SelectionMode="Single"
+                            SelectionChanged="OnPcSelected"
+                            HeightRequest="132"
+                            EmptyView="还没搜索到电脑">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Label Text="{Binding Ip}" FontSize="16" Padding="10,8" />
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Frame>
+
+        <Label Text="电脑屏幕上显示的 6 位码" FontSize="13" TextColor="Gray" />
+        <Entry x:Name="CodeEntry" Placeholder="例如 W5GY73" MaxLength="6"
+               FontSize="18" Keyboard="Text" CharacterSpacing="3" />
+        <Button x:Name="BtnPair" Text="连接" Clicked="OnPair" />
+        <Label x:Name="StatusLabel" Text="" FontSize="14" TextColor="Gray"
                HorizontalOptions="Center" Padding="0,8" />
-    </Grid>
+    </VerticalStackLayout>
 </ContentPage>

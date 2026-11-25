@@ -15,9 +15,11 @@ public class PcRemoteDataSourceHttpTests
         public string? LastPath;
         public string? LastMethod;
         public string? LastBody;
+        public string? LastHost;
         protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken ct)
         {
+            LastHost = request.RequestUri?.Authority;
             LastPath = request.RequestUri?.PathAndQuery;
             LastAuth = request.Headers.TryGetValues("Authorization", out var v)
                 ? v.FirstOrDefault() : null;
@@ -144,6 +146,25 @@ public class PcRemoteDataSourceHttpTests
 
         Assert.True(ok);
         Assert.Equal("/pair?code=ABC234", handler.LastPath);
+        Assert.Equal("tok-123", await store.GetAsync("hopon.pair_token"));
+    }
+
+    [Fact]
+    public async Task DiscoveredIp_PlusTypedCode_Pairs()
+    {
+        // 新流程：UDP 发现拿到 IP → 手机手输 6 位码，不再靠二维码
+        var handler = new FakeHandler();
+        var client = new HttpClient(handler);
+        var store = new InMemorySecureStore();
+        var ds = new PcRemoteDataSource(store, client);
+
+        var pc = new DiscoveredPc("10.253.2.7", 8766);
+        ds.SetBaseUrl($"http://{pc.Ip}:{pc.Port}");
+        var ok = await ds.RedeemCodeAsync("W5GY73");
+
+        Assert.True(ok);
+        Assert.Equal("10.253.2.7:8766", handler.LastHost);
+        Assert.Equal("/pair?code=W5GY73", handler.LastPath);
         Assert.Equal("tok-123", await store.GetAsync("hopon.pair_token"));
     }
 }
