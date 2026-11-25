@@ -16,8 +16,9 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-        builder.Services.AddSingleton<ISecureStore, InMemorySecureStore>();
-        builder.Services.AddSingleton<IHopOnDataSource, PcRemoteDataSource>();
+        builder.Services.AddSingleton<ISecureStore, MauiSecureStore>();
+        builder.Services.AddSingleton<IHopOnDataSource>(sp =>
+            new PcRemoteDataSource(sp.GetRequiredService<ISecureStore>()));
         builder.Services.AddSingleton<MainPage>();
 
 #if DEBUG
