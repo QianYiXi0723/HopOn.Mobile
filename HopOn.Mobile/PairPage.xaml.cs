@@ -14,10 +14,20 @@ public partial class PairPage : ContentPage
         _source = (PcRemoteDataSource)source;
     }
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
-        Scanner.IsDetecting = true;   // 只在页面出现时开检测（生命周期纪律）
+        // Android 6+ 相机是危险权限，ZXing 0.4.0 不会自行申请——必须显式请求，
+        // 否则扫码页黑屏无回调（真机验证过的坑）。
+        var status = await Permissions.RequestAsync<Permissions.Camera>();
+        if (status == PermissionStatus.Granted)
+        {
+            Scanner.IsDetecting = true;   // 只在页面出现时开检测（生命周期纪律）
+        }
+        else
+        {
+            StatusLabel.Text = "需要相机权限才能扫码，请在系统设置里允许";
+        }
     }
 
     protected override void OnDisappearing()
