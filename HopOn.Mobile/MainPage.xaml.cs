@@ -4,8 +4,12 @@ namespace HopOn.Mobile;
 
 public partial class MainPage : ContentPage
 {
-    private static readonly Color Muted = Color.FromArgb("#888888");
-    private static readonly Color Card = Color.FromArgb("#F2F4F8");
+    // 卡片配色跟随系统主题：深色模式深底白字，浅色模式浅底黑字。
+    // 不能只把背景写死浅色而让文字跟随系统——深色模式下会变成白字浅底看不清。
+    private static bool IsDark => Application.Current?.RequestedTheme == AppTheme.Dark;
+    private static Color Muted => IsDark ? Color.FromArgb("#9AA0A6") : Color.FromArgb("#888888");
+    private static Color Card => IsDark ? Color.FromArgb("#2A2D31") : Color.FromArgb("#F2F4F8");
+    private static Color Fg => IsDark ? Color.FromArgb("#F1F3F5") : Color.FromArgb("#111111");
     private readonly IHopOnDataSource _source;
     private AppSnapshot? _snap;
 
@@ -39,12 +43,15 @@ public partial class MainPage : ContentPage
                 Content.Add(GameCard(g));
             }
             Content.Add(new Label { Text = "自定义提醒", FontSize = 18, FontAttributes = FontAttributes.Bold });
-            if (snap.CustomDailies.Count == 0)
-                Content.Add(new Label { Text = "（无）", TextColor = Muted });
+            int shown = 0;
             foreach (var d in snap.CustomDailies)
             {
+                if (!d.PlannedToday) continue;   // 非周计划日的提醒不显示、也不打卡（口径同 PC）
                 Content.Add(DailyRow(d));
+                shown++;
             }
+            if (shown == 0)
+                Content.Add(new Label { Text = "（无）", TextColor = Muted });
         }
         catch (Exception ex)
         {
@@ -56,7 +63,7 @@ public partial class MainPage : ContentPage
     {
         var status = g.Finished ? "已完成" : (g.Stale ? "稍旧" : "进行中");
         var box = new VerticalStackLayout { Padding = 14, Spacing = 4, BackgroundColor = Card };
-        box.Children.Add(new Label { Text = $"{g.Name}  ·  {status}", FontSize = 16, FontAttributes = FontAttributes.Bold });
+        box.Children.Add(new Label { Text = $"{g.Name}  ·  {status}", TextColor = Fg, FontSize = 16, FontAttributes = FontAttributes.Bold });
         box.Children.Add(new Label { Text = $"{g.StaminaName} {g.Current}/{g.Max}", TextColor = Muted, FontSize = 14 });
         box.Children.Add(new Label { Text = $"日常 {g.DailyDone}/{g.DailyTotal}  {g.DailyProgress}", TextColor = Muted, FontSize = 14 });
         return box;
@@ -68,7 +75,7 @@ public partial class MainPage : ContentPage
         row.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
         row.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
         row.Children.Add(new Label { Text = d.Done ? $"{d.Name} ✓" : d.Name,
-            VerticalOptions = LayoutOptions.Center });
+            TextColor = Fg, VerticalOptions = LayoutOptions.Center });
         var btn = new Button { Text = d.Done ? "撤销" : "打卡",
             FontSize = 13, VerticalOptions = LayoutOptions.Center };
         btn.Clicked += async (_, __) =>
